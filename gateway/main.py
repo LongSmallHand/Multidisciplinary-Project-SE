@@ -20,7 +20,7 @@ AIO_FEED_IDS = [
     "microbit-led"
 ]
 AIO_USERNAME = "Long1961"
-AIO_KEY = "aio_whrR18HSoEZGxO5FJTA0UPgiO3no"
+AIO_KEY = "aio_SAxT9289XSFN1UiAkHZy4SNueRJU"
 
 cred = credentials.Certificate("./serviceAccountKey.json")
 default_app = firebase_admin.initialize_app(cred)
@@ -90,15 +90,13 @@ client.on_subscribe = subscribe
 client.connect()
 client.loop_background()
 
-# ser = serial.Serial(port=getPort(), baudrate=115200)
-
 def processData(data):
     data = data.replace("!", "")
     data = data.replace("#", "")
     splitData = data.split(":")
     print(splitData)
-    push_data = splitData[2]
     try: 
+        push_data = splitData[2]
         if splitData[1] == "TEMP":
             client.publish("microbit-temp", splitData[2])
             collection_ref['temperature_data'].add({
@@ -128,16 +126,6 @@ def processData(data):
             collection_ref['light_data'].add({
                 'createAt': datetime.now(),
                 'value': push_data,
-            })  
-        elif splitData[1] == "PUMP":
-            client.publish("microbit-pump", splitData[2])
-            document_ref['pump'].update({
-                'state': 'ON' if splitData[2] == '3' else 'OFF'
-            })  
-        elif splitData[1] == "LED":
-            client.publish("microbit-led", splitData[2])
-            document_ref['pump'].update({
-                'state': 'ON' if splitData[2] == '3' else 'OFF'
             })  
     except IndexError:
         print("Read failed")
